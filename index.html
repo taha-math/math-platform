@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة الأستاذ طه للرياضيات</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <header>
+    <h1>منصة الأستاذ طه للرياضيات</h1>
+    <nav>
+      <a href="index.html">الرئيسية</a>
+      <a href="admin.html">لوحة التحكم</a>
+      <button class="theme-toggle" onclick="toggleTheme()">🌓 النمط</button>
+    </nav>
+  </header>
+
+  <div class="container">
+    <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن درس، مثال، تمرين أو قانون رياضي..." onkeyup="globalSearch()">
+
+    <h2 style="margin-bottom: 1.5rem;">اختر الصف الدراسي:</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>الصف السابع</h3>
+        <p>دروس الجبر والهندسة، تمارين شاملة ومسائل محلولة.</p>
+        <a href="grade7.html" class="btn">تصفح الصف السابع</a>
+      </div>
+      <div class="card">
+        <h3>الصف الثامن</h3>
+        <p>الكثيرات الحدود، المطابقات، والوحدات الهندسية الأساسية.</p>
+        <a href="grade8.html" class="btn">تصفح الصف الثامن</a>
+      </div>
+      <div class="card">
+        <h3>الصف التاسع</h3>
+        <p>المعادلات التربيعية، الجذور، وبنك الأسئلة التحضيري.</p>
+        <a href="grade9.html" class="btn">تصفح الصف التاسع</a>
+      </div>
+    </div>
+
+    <div id="searchResults" style="margin-top: 2rem;"></div>
+  </div>
+
+  <footer>
+    <p>جميع الحقوق محفوظة © منصة الأستاذ طه للرياضيات 2026</p>
+  </footer>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    function globalSearch() {
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+      const resultsDiv = document.getElementById("searchResults");
+      if (!query || !window.appData) {
+        resultsDiv.innerHTML = "";
+        return;
+      }
+      
+      let html = "<h3>نتائج البحث:</h3><div class='grid'>";
+      let found = false;
+
+      window.appData.grades.forEach(grade => {
+        grade.units.forEach(unit => {
+          unit.lessons.forEach(lesson => {
+            if (lesson.title.toLowerCase().includes(query) || lesson.explanation.toLowerCase().includes(query) || lesson.examples.toLowerCase().includes(query)) {
+              found = true;
+              html += `<div class="card">
+                <span style="font-size:0.85rem; color:var(--primary-color);">${grade.name} > ${unit.name}</span>
+                <h3>${lesson.title}</h3>
+                <a href="lesson.html?grade=${grade.id}&unit=${unit.id}&lesson=${lesson.id}" class="btn">عرض الدرس</a>
+              </div>`;
+            }
+          });
+        });
+      });
+      html += "</div>";
+      resultsDiv.innerHTML = found ? html : "<p>لم يتم العثور على نتائج تطابق بحثك.</p>";
+      renderMath();
+    }
+  </script>
+</body>
+</html>
