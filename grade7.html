@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الصف السابع - منصة الأستاذ طه</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <header>
+    <h1 id="pageTitle">الصف السابع</h1>
+    <nav>
+      <a href="index.html">الرئيسية</a>
+      <a href="admin.html">لوحة التحكم</a>
+      <button class="theme-toggle" onclick="toggleTheme()">🌓 النمط</button>
+    </nav>
+  </header>
+
+  <div class="container" id="contentContainer">
+    <p>جاري تحميل محتوى الوحدات والدروس...</p>
+  </div>
+
+  <footer>
+    <p>منصة الأستاذ طه للرياضيات</p>
+  </footer>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    const targetGradeId = "grade7";
+
+    function initPage(data) {
+      const grade = data.grades.find(g => g.id === targetGradeId);
+      if (!grade) return;
+
+      document.getElementById("pageTitle").innerText = grade.name;
+      let html = "";
+
+      grade.units.forEach(unit => {
+        html += `<div style="margin-bottom: 2rem;">
+          <h2 style="border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">${unit.name}</h2>
+          <div class="grid">`;
+        
+        unit.lessons.forEach(lesson => {
+          html += `<div class="card">
+            <h3>${lesson.title}</h3>
+            <p>${lesson.explanation.substring(0, 100)}...</p>
+            <a href="lesson.html?grade=${grade.id}&unit=${unit.id}&lesson=${lesson.id}" class="btn">دخول الدرس</a>
+          </div>`;
+        });
+
+        html += `</div></div>`;
+      });
+
+      document.getElementById("contentContainer").innerHTML = html;
+      renderMath();
+    }
+  </script>
+</body>
+</html>
