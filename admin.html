@@ -20,13 +20,13 @@
   <div class="container">
     <!-- إعدادات الربط المباشر مع GitHub -->
     <div style="margin-bottom: 2rem; background: var(--card-bg); padding: 1.5rem; border-radius: 8px; border: 2px solid var(--primary-color);">
-      <h3 style="color:var(--primary-color); margin-bottom:0.5rem;">إعدادات النشر التلقائي (مرة واحدة فقط)</h3>
-      <p style="margin-bottom: 1rem; font-size: 0.9rem;">أدخل بيانات مستودعك ورمز الربط (GitHub Token) لكي يتم حفظ ونشر التعديلات مباشرة دون الحاجة لتحميل أو رفع ملفات يدوياً.</p>
+      <h3 style="color:var(--primary-color); margin-bottom:0.5rem;">إعدادات النشر التلقائي</h3>
+      <p style="margin-bottom: 1rem; font-size: 0.9rem;">أدخل بيانات مستودعك ورمز الربط (GitHub Token) للنشر المباشر.</p>
       
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
         <div class="form-group" style="margin:0;">
-          <label>اسم المستخدم والمستودع (مثال: `taha-math/math-platform`):</label>
-          <input type="text" id="ghRepo" placeholder="username/repository">
+          <label>اسم المستخدم والمستودع:</label>
+          <input type="text" id="ghRepo" placeholder="taha-math/math-platform">
         </div>
         <div class="form-group" style="margin:0;">
           <label>رمز الربط الشخصي (GitHub Token):</label>
@@ -41,7 +41,7 @@
     <div style="margin-bottom: 2rem; background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
       <div>
         <h3 style="margin:0;">النشر الفوري على الموقع</h3>
-        <p style="margin:0; font-size:0.85rem; color:#64748b;">بعد إضافة/تعديل أي وحدة أو درس، اضغط هنا لنشر التعديلات مباشرة على الموقع.</p>
+        <p style="margin:0; font-size:0.85rem; color:#64748b;">بعد إضافة عدة دروس، اضغط هنا لنشر التعديلات دفعة واحدة.</p>
       </div>
       <div>
         <button class="btn" style="background:#2563eb; font-size:1.1rem; padding: 0.75rem 1.5rem; margin-top:0;" onclick="publishToGitHub()">🚀 حفظ ونشر مباشر على GitHub</button>
@@ -109,7 +109,7 @@
             <label>ملاحظات:</label>
             <textarea id="inpNotes" oninput="livePreview()"></textarea>
           </div>
-          <button class="btn" onclick="saveCurrentLesson()">حفظ التعديلات على الدرس</button>
+          <button class="btn" onclick="saveCurrentLesson()">حفظ الدرس (إضافة/تعديل)</button>
           <button class="btn" style="background:#dc2626; margin-right:0.5rem;" onclick="deleteCurrentLesson()">حذف هذا الدرس</button>
         </div>
       </div>
@@ -157,11 +157,11 @@
       const token = document.getElementById("ghToken").value.trim();
 
       if (!repo || !token) {
-        alert("يرجى إدخال اسم المستودع ورمز الربط (Token) في الأعلى أولاً.");
+        alert("يرجى إدخال اسم المستودع ورمز الربط في الأعلى أولاً.");
         return;
       }
 
-      if (!confirm("هل تريد نشر التحديثات الحالية مباشرة على موقعك في GitHub؟")) return;
+      if (!confirm("هل تريد نشر جميع الدروس والتعديلات الحالية على موقعك في GitHub؟")) return;
 
       const filePath = "data/data.json";
       const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
@@ -187,14 +187,14 @@
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            message: "تحديث المحتوى والوحدات عبر لوحة التحكم الذكية للأستاذ طه",
+            message: "إضافة وتحديث عدة دروس عبر لوحة التحكم الذكية للأستاذ طه",
             content: contentBase64,
             sha: sha ? sha : undefined
           })
         });
 
         if (putRes.ok) {
-          alert("🎉 تم نشر التعديلات بنجاح على الموقع! ستظهر التغييرات للطلاب خلال أقل من دقيقة.");
+          alert("🎉 تم نشر جميع الدروس بنجاح على الموقع! ستظهر التغييرات للطلاب خلال أقل من دقيقة.");
         } else {
           const err = await putRes.json();
           alert("فشل النشر: " + (err.message || "تأكد من صحة بيانات المستودع والرمز."));
@@ -271,7 +271,7 @@
         lessons: []
       });
 
-      alert("تمت إضافة الوحدة بنجاح! تذكر النقر على زر 'حفظ ونشر مباشر على GitHub' لاعتمادها على الموقع.");
+      alert("تمت إضافة الوحدة بنجاح!");
       populateUnits();
       document.getElementById("selUnit").value = newUnitId;
       onUnitSelected();
@@ -291,7 +291,7 @@
       const unit = grade.units.find(u => u.id === unitId);
       if (unit) {
         unit.name = unitName;
-        alert("تم تحديث اسم الوحدة بنجاح! لا تنسَ النقر على زر النشر المباشر لحفظه على الموقع.");
+        alert("تم تحديث اسم الوحدة بنجاح!");
         populateUnits();
         document.getElementById("selUnit").value = unitId;
       }
@@ -305,7 +305,7 @@
       if (confirm("هل أنت متأكد من حذف هذه الوحدة مع جميع دروسها؟")) {
         const grade = localData.grades.find(g => g.id === gradeId);
         grade.units = grade.units.filter(u => u.id !== unitId);
-        alert("تم حذف الوحدة. اضغط على زر النشر المباشر لحفظ التغييرات.");
+        alert("تم حذف الوحدة.");
         populateUnits();
       }
     }
@@ -394,9 +394,10 @@
       }
 
       if (lessonId === "new") {
-        const newId = "l_" + Date.now();
+        // إنشاء معرّف فريد ومستقل لكل درس جديد لضمان عدم تداخلهم
+        const newId = "l_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
         unit.lessons.push({ id: newId, title, explanation, examples, exercises, solutions, notes });
-        alert("تمت إضافة الدرس محلياً! اضغط على زر 'حفظ ونشر مباشر على GitHub' في الأعلى لنشره فوراً على الموقع.");
+        alert("تمت إضافة الدرس بنجاح! يمكنك الآن اختيار '+ إضافة درس جديد' وإضافة درس آخر بكل سهولة.");
         populateLessons();
         document.getElementById("selLesson").value = newId;
       } else {
@@ -408,7 +409,7 @@
           lesson.exercises = exercises;
           lesson.solutions = solutions;
           lesson.notes = notes;
-          alert("تم تحديث الدرس محلياً! لا تنسَ الضغط على زر النشر المباشر لاعتماد التغييرات.");
+          alert("تم تحديث الدرس بنجاح!");
         }
       }
     }
@@ -423,7 +424,7 @@
         const grade = localData.grades.find(g => g.id === gradeId);
         const unit = grade.units.find(u => u.id === unitId);
         unit.lessons = unit.lessons.filter(l => l.id !== lessonId);
-        alert("تم حذف الدرس محلياً. اضغط على زر النشر المباشر لحفظ التغييرات.");
+        alert("تم حذف الدرس.");
         populateLessons();
       }
     }
