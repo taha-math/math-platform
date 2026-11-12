@@ -25,6 +25,15 @@
               "exercises": "-5+3=",
               "solutions": "+2",
               "notes": "انتبه للعمليات بشكل جيد"
+            },
+            {
+              "id": "l_1794490966546",
+              "title": "الدرس الثاني",
+              "explanation": "تعرف على انواع الاعداد ",
+              "examples": "5   8     9     7     0    -1   -2   ",
+              "exercises": "",
+              "solutions": "",
+              "notes": ""
             }
           ]
         },
