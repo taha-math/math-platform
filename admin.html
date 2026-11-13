@@ -6,11 +6,13 @@
   <title>لوحة التحكم الذكية - منصة الأستاذ طه</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- مكتبة قراءة ملفات الـ Word وتحويلها -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
   <header>
-    <h1>لوحة التحكم والنشر المباشر</h1>
+    <h1>لوحة التحكم واستيراد ملفات Word</h1>
     <nav>
       <a href="index.html">عرض الموقع</a>
       <button class="theme-toggle" onclick="toggleTheme()">🌓 النمط</button>
@@ -18,13 +20,12 @@
   </header>
 
   <div class="container">
+    <!-- إعدادات النشر المباشر -->
     <div style="margin-bottom: 2rem; background: var(--card-bg); padding: 1.5rem; border-radius: 8px; border: 2px solid var(--primary-color);">
-      <h3 style="color:var(--primary-color); margin-bottom:0.5rem;">إعدادات النشر التلقائي (مرة واحدة فقط)</h3>
-      <p style="margin-bottom: 1.5rem; font-size: 0.9rem;">أدخل بيانات مستودعك ورمز الربط (GitHub Token) للنشر المباشر دون الحاجة لتحميل أو رفع ملفات يدوياً.</p>
-      
+      <h3 style="color:var(--primary-color); margin-bottom:0.5rem;">إعدادات النشر التلقائي عبر GitHub</h3>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
         <div class="form-group" style="margin:0;">
-          <label>اسم المستخدم والمستودع (مثال: `taha-math/math-platform`):</label>
+          <label>اسم المستخدم والمستودع:</label>
           <input type="text" id="ghRepo" placeholder="taha-math/math-platform">
         </div>
         <div class="form-group" style="margin:0;">
@@ -36,19 +37,24 @@
       <span id="saveStatus" style="margin-right:1rem; font-weight:600; color:#059669;"></span>
     </div>
 
+    <!-- زر النشر السريع واستيراد الوورد -->
     <div style="margin-bottom: 2rem; background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
       <div>
-        <h3 style="margin:0;">النشر الفوري على الموقع</h3>
-        <p style="margin:0; font-size:0.85rem; color:#64748b;">بعد إضافة عدة وحدات ودروس، اضغط هنا لنشر التعديلات دفعة واحدة على الموقع.</p>
+        <h3 style="margin:0;">النشر الفوري</h3>
+        <p style="margin:0; font-size:0.85rem; color:#64748b;">انشر تعديلاتك على الموقع بضغطة زر.</p>
       </div>
-      <div>
-        <button class="btn" style="background:#2563eb; font-size:1.1rem; padding: 0.75rem 1.5rem; margin-top:0;" onclick="publishToGitHub()">🚀 حفظ ونشر مباشر على GitHub</button>
-        <button class="btn" style="background:#4b5563; margin-top:0; margin-right:0.5rem;" onclick="exportData()">تنزيل احتياطي (JSON)</button>
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <label class="btn" style="background:#0284c7; margin-top:0; cursor:pointer;">
+          📁 استيراد درس من ملف Word (.docx)
+          <input type="file" id="wordFile" accept=".docx" style="display:none" onchange="importWordFile(event)">
+        </label>
+        <button class="btn" style="background:#2563eb; margin-top:0;" onclick="publishToGitHub()">🚀 حفظ ونشر مباشر على GitHub</button>
       </div>
     </div>
 
     <div class="admin-container">
       <div>
+        <!-- إدارة الوحدات -->
         <div class="card" style="margin-bottom: 1.5rem; border: 2px solid var(--primary-color);">
           <h3 style="color:var(--primary-color)">1. إدارة الوحدات الدراسية</h3>
           <div class="form-group">
@@ -60,16 +66,17 @@
             <select id="selUnit" onchange="onUnitSelected()"></select>
           </div>
           <div class="form-group">
-            <label>تعديل اسم الوحدة المحددة أو إضافة وحدة جديدة:</label>
+            <label>اسم الوحدة الجديدة أو تعديلها:</label>
             <input type="text" id="inpUnitName" placeholder="اكتب اسم الوحدة هنا...">
           </div>
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
             <button class="btn" style="background: #059669; margin-top:0;" onclick="addNewUnit()">+ إضافة وحدة جديدة</button>
-            <button class="btn" style="background: #d97706; margin-top:0;" onclick="updateCurrentUnit()">💾 حفظ تعديل اسم الوحدة</button>
+            <button class="btn" style="background: #d97706; margin-top:0;" onclick="updateCurrentUnit()">💾 حفظ اسم الوحدة</button>
             <button class="btn" style="background: #dc2626; margin-top:0;" onclick="deleteCurrentUnit()">🗑️ حذف الوحدة</button>
           </div>
         </div>
 
+        <!-- إدارة الدروس -->
         <div class="card" style="margin-bottom: 1.5rem;">
           <h3 style="color:var(--primary-color)">2. إدارة الدروس</h3>
           <div class="form-group">
@@ -78,14 +85,15 @@
           </div>
         </div>
 
+        <!-- محرر محتوى الدرس -->
         <div class="card">
-          <h3 style="color:var(--primary-color)">3. محرر محتوى الدرس</h3>
+          <h3 style="color:var(--primary-color)">3. محرر محتوى الدرس (يدعم HTML، الجداول، الصور، وMathJax)</h3>
           <div class="form-group">
             <label>عنوان الدرس:</label>
             <input type="text" id="inpTitle" oninput="livePreview()">
           </div>
           <div class="form-group">
-            <label>الشرح (دعم MathJax - اكتب معادلات مثل \( x^2+5x+6 \)):</label>
+            <label>الشرح (يستوعب نصوص وجداول وصور ملف الـ Word):</label>
             <textarea id="inpExplanation" oninput="livePreview()"></textarea>
           </div>
           <div class="form-group">
@@ -111,9 +119,9 @@
 
       <div>
         <h3>معاينة فورية للدرس (Live Preview)</h3>
-        <div class="preview-pane" id="previewPane">
+        <div class="preview-pane" id="previewPane" style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:10px; padding:1.5rem;">
           <h2 id="prevTitle" style="color:var(--primary-color); margin-bottom:1rem;">عنوان المعاينة</h2>
-          <div id="prevContent">ستظهر المعاينة الرياضية هنا تماماً كما يراها الطالب...</div>
+          <div id="prevContent">ستظهر المعاينة الرياضية والجداول والصور هنا كما يراها الطالب تماماً...</div>
         </div>
       </div>
     </div>
@@ -132,70 +140,72 @@
     });
 
     function loadSavedSettings() {
-      const repo = localStorage.getItem("gh_repo") || "";
-      const token = localStorage.getItem("gh_token") || "";
-      document.getElementById("ghRepo").value = repo;
-      document.getElementById("ghToken").value = token;
+      document.getElementById("ghRepo").value = localStorage.getItem("gh_repo") || "";
+      document.getElementById("ghToken").value = localStorage.getItem("gh_token") || "";
     }
 
     function saveGitHubSettings() {
-      const repo = document.getElementById("ghRepo").value.trim();
-      const token = document.getElementById("ghToken").value.trim();
-      localStorage.setItem("gh_repo", repo);
-      localStorage.setItem("gh_token", token);
-      document.getElementById("saveStatus").innerText = "✓ تم الحفظ بنجاح!";
+      localStorage.setItem("gh_repo", document.getElementById("ghRepo").value.trim());
+      localStorage.setItem("gh_token", document.getElementById("ghToken").value.trim());
+      document.getElementById("saveStatus").innerText = "✓ تم الحفظ!";
       setTimeout(() => document.getElementById("saveStatus").innerText = "", 3000);
+    }
+
+    // دالة استيراد ملف الـ Word وتحويله تلقائياً
+    function importWordFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(loadEvent) {
+        const arrayBuffer = loadEvent.target.result;
+        mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
+          .then(function(result) {
+            let htmlContent = result.value; // النصوص والجداول والصور محولة إلى HTML
+            // وضع المحتوى المستورد في خانة الشرح كمثال أو في الحقل النشط
+            document.getElementById("inpExplanation").value = htmlContent;
+            livePreview();
+            alert("✨ تم استيراد ملف Word بنجاح مع كافة الجداول والصور والتنسيقات!");
+          })
+          .catch(function(err) {
+            alert("حدث خطأ أثناء قراءة ملف الـ Word: " + err.message);
+          });
+      };
+      reader.readAsArrayBuffer(file);
     }
 
     async function publishToGitHub() {
       const repo = document.getElementById("ghRepo").value.trim();
       const token = document.getElementById("ghToken").value.trim();
-
       if (!repo || !token) {
-        alert("يرجى إدخال اسم المستودع ورمز الربط في الأعلى أولاً.");
+        alert("يرجى إدخال اسم المستودع ورمز الربط أولاً.");
         return;
       }
-
-      if (!confirm("هل تريد نشر جميع الوحدات والدروس الحالية مباشرة على موقعك في GitHub؟")) return;
+      if (!confirm("هل تريد نشر التعديلات على الموقع؟")) return;
 
       const filePath = "data/data.json";
       const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
 
       try {
-        const getRes = await fetch(apiUrl, {
-          headers: { "Authorization": `token ${token}` }
-        });
-        
-        let sha = "";
-        if (getRes.ok) {
-          const fileData = await getRes.json();
-          sha = fileData.sha;
-        }
+        const getRes = await fetch(apiUrl, { headers: { "Authorization": `token ${token}` } });
+        let sha = getRes.ok ? (await getRes.json()).sha : "";
 
         const jsonString = JSON.stringify(localData, null, 2);
         const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
 
         const putRes = await fetch(apiUrl, {
           method: "PUT",
-          headers: {
-            "Authorization": `token ${token}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: "تحديث شامل للوحدات والدروس عبر لوحة التحكم الذكية للأستاذ طه",
-            content: contentBase64,
-            sha: sha ? sha : undefined
-          })
+          headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ message: "تحديث المحتوى عبر لوحة التحكم", content: contentBase64, sha: sha || undefined })
         });
 
         if (putRes.ok) {
-          alert("🎉 تم نشر جميع التعديلات بنجاح على الموقع! ستظهر التغييرات للطلاب خلال أقل من دقيقة.");
+          alert("🎉 تم النشر بنجاح على الموقع!");
         } else {
-          const err = await putRes.json();
-          alert("فشل النشر: " + (err.message || "تأكد من صحة بيانات المستودع والرمز."));
+          alert("فشل النشر، تأكد من صحة البيانات والرمز.");
         }
       } catch (e) {
-        alert("حدث خطأ أثناء الاتصال بـ GitHub: " + e.message);
+        alert("خطأ في الاتصال: " + e.message);
       }
     }
 
@@ -226,7 +236,6 @@
         populateLessons();
         return;
       }
-      
       grade.units.forEach(u => {
         let opt = document.createElement("option");
         opt.value = u.id;
@@ -241,32 +250,18 @@
       const unitId = document.getElementById("selUnit").value;
       const grade = localData.grades.find(g => g.id === gradeId);
       const unit = grade ? grade.units.find(u => u.id === unitId) : null;
-      
-      if (unit) {
-        document.getElementById("inpUnitName").value = unit.name;
-      } else {
-        document.getElementById("inpUnitName").value = "";
-      }
+      document.getElementById("inpUnitName").value = unit ? unit.name : "";
       populateLessons();
     }
 
     function addNewUnit() {
       const unitName = document.getElementById("inpUnitName").value.trim();
-      if (!unitName) {
-        alert("يرجى كتابة اسم الوحدة في حقل اسم الوحدة أولاً.");
-        return;
-      }
+      if (!unitName) { alert("اكتب اسم الوحدة أولاً."); return; }
       const gradeId = document.getElementById("selGrade").value;
       const grade = localData.grades.find(g => g.id === gradeId);
-      const newUnitId = "u_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-      
-      grade.units.push({
-        id: newUnitId,
-        name: unitName,
-        lessons: []
-      });
-
-      alert("تمت إضافة الوحدة بنجاح! يمكنك الآن اختيارها وإضافة دروس تحتها.");
+      const newUnitId = "u_" + Date.now();
+      grade.units.push({ id: newUnitId, name: unitName, lessons: [] });
+      alert("تمت إضافة الوحدة!");
       populateUnits();
       document.getElementById("selUnit").value = newUnitId;
       onUnitSelected();
@@ -276,17 +271,12 @@
       const gradeId = document.getElementById("selGrade").value;
       const unitId = document.getElementById("selUnit").value;
       const unitName = document.getElementById("inpUnitName").value.trim();
-      
-      if (!unitId || !unitName) {
-        alert("يرجى اختيار وحدة وتعديل اسمها.");
-        return;
-      }
-
+      if (!unitId || !unitName) return;
       const grade = localData.grades.find(g => g.id === gradeId);
       const unit = grade.units.find(u => u.id === unitId);
       if (unit) {
         unit.name = unitName;
-        alert("تم تحديث اسم الوحدة بنجاح!");
+        alert("تم تحديث اسم الوحدة!");
         populateUnits();
         document.getElementById("selUnit").value = unitId;
       }
@@ -296,11 +286,10 @@
       const gradeId = document.getElementById("selGrade").value;
       const unitId = document.getElementById("selUnit").value;
       if (!unitId) return;
-
-      if (confirm("هل أنت متأكد من حذف هذه الوحدة مع جميع دروسها؟")) {
+      if (confirm("حذف هذه الوحدة مع دروسها؟")) {
         const grade = localData.grades.find(g => g.id === gradeId);
         grade.units = grade.units.filter(u => u.id !== unitId);
-        alert("تم حذف الوحدة.");
+        alert("تم الحذف.");
         populateUnits();
       }
     }
@@ -326,7 +315,6 @@
       const gradeId = document.getElementById("selGrade").value;
       const unitId = document.getElementById("selUnit").value;
       const lessonId = document.getElementById("selLesson").value;
-      
       const grade = localData.grades.find(g => g.id === gradeId);
       const unit = grade ? grade.units.find(u => u.id === unitId) : null;
       
@@ -341,10 +329,10 @@
         const lesson = unit.lessons.find(l => l.id === lessonId);
         if (lesson) {
           document.getElementById("inpTitle").value = lesson.title;
-          document.getElementById("inpExplanation").value = lesson.explanation;
-          document.getElementById("inpExamples").value = lesson.examples;
-          document.getElementById("inpExercises").value = lesson.exercises;
-          document.getElementById("inpSolutions").value = lesson.solutions;
+          document.getElementById("inpExplanation").value = lesson.explanation || "";
+          document.getElementById("inpExamples").value = lesson.examples || "";
+          document.getElementById("inpExercises").value = lesson.exercises || "";
+          document.getElementById("inpSolutions").value = lesson.solutions || "";
           document.getElementById("inpNotes").value = lesson.notes || "";
         }
       }
@@ -354,57 +342,41 @@
     function livePreview() {
       const title = document.getElementById("inpTitle").value || "عنوان الدرس";
       const exp = document.getElementById("inpExplanation").value || "";
-      const ex = document.getElementById("inpExamples").value || "";
-      
       document.getElementById("prevTitle").innerText = title;
-      document.getElementById("prevContent").innerHTML = `
-        <h4>الشرح:</h4><p>${exp}</p>
-        <h4 style="margin-top:1rem;">الأمثلة:</h4><p>${ex}</p>
-      `;
+      document.getElementById("prevContent").innerHTML = `<h4>الشرح:</h4><div>${exp}</div>`;
       renderMath();
     }
 
     function saveCurrentLesson() {
       const gradeId = document.getElementById("selGrade").value;
       const unitId = document.getElementById("selUnit").value;
-      if (!unitId) {
-        alert("يرجى إنشاء وحدة دراسية واختيارها أولاً.");
-        return;
-      }
-
+      if (!unitId) { alert("اختر الوحدة أولاً."); return; }
       const grade = localData.grades.find(g => g.id === gradeId);
       const unit = grade.units.find(u => u.id === unitId);
       const lessonId = document.getElementById("selLesson").value;
 
       const title = document.getElementById("inpTitle").value;
-      const explanation = document.getElementById("inpExplanation").value;
-      const examples = document.getElementById("inpExamples").value;
-      const exercises = document.getElementById("inpExercises").value;
-      const solutions = document.getElementById("inpSolutions").value;
-      const notes = document.getElementById("inpNotes").value;
+      if (!title) { alert("أدخل عنوان الدرس."); return; }
 
-      if (!title) {
-        alert("يرجى إدخال عنوان الدرس على الأقل.");
-        return;
-      }
+      const lessonData = {
+        id: lessonId === "new" ? "l_" + Date.now() : lessonId,
+        title: title,
+        explanation: document.getElementById("inpExplanation").value,
+        examples: document.getElementById("inpExamples").value,
+        exercises: document.getElementById("inpExercises").value,
+        solutions: document.getElementById("inpSolutions").value,
+        notes: document.getElementById("inpNotes").value
+      };
 
       if (lessonId === "new") {
-        const newId = "l_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-        unit.lessons.push({ id: newId, title, explanation, examples, exercises, solutions, notes });
-        alert("تمت إضافة الدرس بنجاح! يمكنك الآن اختيار '+ إضافة درس جديد' وإضافة درس آخر.");
+        unit.lessons.push(lessonData);
+        alert("تمت إضافة الدرس محلياً! انقر على زر النشر المباشر لاعتماده.");
         populateLessons();
-        document.getElementById("selLesson").value = newId;
+        document.getElementById("selLesson").value = lessonData.id;
       } else {
-        const lesson = unit.lessons.find(l => l.id === lessonId);
-        if (lesson) {
-          lesson.title = title;
-          lesson.explanation = explanation;
-          lesson.examples = examples;
-          lesson.exercises = exercises;
-          lesson.solutions = solutions;
-          lesson.notes = notes;
-          alert("تم تحديث الدرس بنجاح!");
-        }
+        const idx = unit.lessons.findIndex(l => l.id === lessonId);
+        if (idx !== -1) unit.lessons[idx] = lessonData;
+        alert("تم تحديث الدرس محلياً!");
       }
     }
 
@@ -412,25 +384,14 @@
       const gradeId = document.getElementById("selGrade").value;
       const unitId = document.getElementById("selUnit").value;
       const lessonId = document.getElementById("selLesson").value;
-
       if (lessonId === "new" || !unitId) return;
-      if (confirm("هل أنت متأكد من حذف هذا الدرس نهائياً؟")) {
+      if (confirm("حذف هذا الدرس؟")) {
         const grade = localData.grades.find(g => g.id === gradeId);
         const unit = grade.units.find(u => u.id === unitId);
         unit.lessons = unit.lessons.filter(l => l.id !== lessonId);
-        alert("تم حذف الدرس.");
+        alert("تم الحذف.");
         populateLessons();
       }
-    }
-
-    function exportData() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localData, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", "data.json");
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
     }
   </script>
 </body>
