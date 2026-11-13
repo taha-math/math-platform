@@ -6,13 +6,11 @@
   <title>لوحة التحكم الذكية - منصة الأستاذ طه</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- مكتبة قراءة ملفات الـ Word وتحويلها -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
   <header>
-    <h1>لوحة التحكم واستيراد ملفات Word</h1>
+    <h1>لوحة التحكم والنشر المباشر</h1>
     <nav>
       <a href="index.html">عرض الموقع</a>
       <button class="theme-toggle" onclick="toggleTheme()">🌓 النمط</button>
@@ -20,9 +18,8 @@
   </header>
 
   <div class="container">
-    <!-- إعدادات النشر المباشر -->
     <div style="margin-bottom: 2rem; background: var(--card-bg); padding: 1.5rem; border-radius: 8px; border: 2px solid var(--primary-color);">
-      <h3 style="color:var(--primary-color); margin-bottom:0.5rem;">إعدادات النشر التلقائي عبر GitHub</h3>
+      <h3 style="color:var(--primary-color); margin-bottom:0.5rem;">إعدادات النشر التلقائي (GitHub API)</h3>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
         <div class="form-group" style="margin:0;">
           <label>اسم المستخدم والمستودع:</label>
@@ -37,24 +34,19 @@
       <span id="saveStatus" style="margin-right:1rem; font-weight:600; color:#059669;"></span>
     </div>
 
-    <!-- زر النشر السريع واستيراد الوورد -->
     <div style="margin-bottom: 2rem; background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
       <div>
-        <h3 style="margin:0;">النشر الفوري</h3>
-        <p style="margin:0; font-size:0.85rem; color:#64748b;">انشر تعديلاتك على الموقع بضغطة زر.</p>
+        <h3 style="margin:0;">النشر الفوري على الموقع</h3>
+        <p style="margin:0; font-size:0.85rem; color:#64748b;">انشر تعديلاتك ومعادلاتك الرياضية مباشرة.</p>
       </div>
-      <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-        <label class="btn" style="background:#0284c7; margin-top:0; cursor:pointer;">
-          📁 استيراد درس من ملف Word (.docx)
-          <input type="file" id="wordFile" accept=".docx" style="display:none" onchange="importWordFile(event)">
-        </label>
-        <button class="btn" style="background:#2563eb; margin-top:0;" onclick="publishToGitHub()">🚀 حفظ ونشر مباشر على GitHub</button>
+      <div>
+        <button class="btn" style="background:#2563eb; font-size:1.1rem; padding: 0.75rem 1.5rem; margin-top:0;" onclick="publishToGitHub()">🚀 حفظ ونشر مباشر على GitHub</button>
+        <button class="btn" style="background:#4b5563; margin-top:0; margin-right:0.5rem;" onclick="exportData()">تنزيل احتياطي (JSON)</button>
       </div>
     </div>
 
     <div class="admin-container">
       <div>
-        <!-- إدارة الوحدات -->
         <div class="card" style="margin-bottom: 1.5rem; border: 2px solid var(--primary-color);">
           <h3 style="color:var(--primary-color)">1. إدارة الوحدات الدراسية</h3>
           <div class="form-group">
@@ -66,7 +58,7 @@
             <select id="selUnit" onchange="onUnitSelected()"></select>
           </div>
           <div class="form-group">
-            <label>اسم الوحدة الجديدة أو تعديلها:</label>
+            <label>تعديل اسم الوحدة أو إضافة وحدة جديدة:</label>
             <input type="text" id="inpUnitName" placeholder="اكتب اسم الوحدة هنا...">
           </div>
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -76,7 +68,6 @@
           </div>
         </div>
 
-        <!-- إدارة الدروس -->
         <div class="card" style="margin-bottom: 1.5rem;">
           <h3 style="color:var(--primary-color)">2. إدارة الدروس</h3>
           <div class="form-group">
@@ -85,15 +76,14 @@
           </div>
         </div>
 
-        <!-- محرر محتوى الدرس -->
         <div class="card">
-          <h3 style="color:var(--primary-color)">3. محرر محتوى الدرس (يدعم HTML، الجداول، الصور، وMathJax)</h3>
+          <h3 style="color:var(--primary-color)">3. محرر محتوى الدرس (دعم MathJax للأسس والجذور)</h3>
           <div class="form-group">
             <label>عنوان الدرس:</label>
             <input type="text" id="inpTitle" oninput="livePreview()">
           </div>
           <div class="form-group">
-            <label>الشرح (يستوعب نصوص وجداول وصور ملف الـ Word):</label>
+            <label>الشرح (اكتب المعادلات هكذا: \( x^2 \) أو الجذور \( \sqrt{x} \)):</label>
             <textarea id="inpExplanation" oninput="livePreview()"></textarea>
           </div>
           <div class="form-group">
@@ -121,7 +111,7 @@
         <h3>معاينة فورية للدرس (Live Preview)</h3>
         <div class="preview-pane" id="previewPane" style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:10px; padding:1.5rem;">
           <h2 id="prevTitle" style="color:var(--primary-color); margin-bottom:1rem;">عنوان المعاينة</h2>
-          <div id="prevContent">ستظهر المعاينة الرياضية والجداول والصور هنا كما يراها الطالب تماماً...</div>
+          <div id="prevContent">ستظهر المعاينة الرياضية هنا تماماً كما يراها الطالب...</div>
         </div>
       </div>
     </div>
@@ -151,37 +141,11 @@
       setTimeout(() => document.getElementById("saveStatus").innerText = "", 3000);
     }
 
-    // دالة استيراد ملف الـ Word وتحويله تلقائياً
-    function importWordFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(loadEvent) {
-        const arrayBuffer = loadEvent.target.result;
-        mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
-          .then(function(result) {
-            let htmlContent = result.value; // النصوص والجداول والصور محولة إلى HTML
-            // وضع المحتوى المستورد في خانة الشرح كمثال أو في الحقل النشط
-            document.getElementById("inpExplanation").value = htmlContent;
-            livePreview();
-            alert("✨ تم استيراد ملف Word بنجاح مع كافة الجداول والصور والتنسيقات!");
-          })
-          .catch(function(err) {
-            alert("حدث خطأ أثناء قراءة ملف الـ Word: " + err.message);
-          });
-      };
-      reader.readAsArrayBuffer(file);
-    }
-
     async function publishToGitHub() {
       const repo = document.getElementById("ghRepo").value.trim();
       const token = document.getElementById("ghToken").value.trim();
-      if (!repo || !token) {
-        alert("يرجى إدخال اسم المستودع ورمز الربط أولاً.");
-        return;
-      }
-      if (!confirm("هل تريد نشر التعديلات على الموقع؟")) return;
+      if (!repo || !token) { alert("أدخل اسم المستودع والرمز أولاً."); return; }
+      if (!confirm("نشر التعديلات على الموقع؟")) return;
 
       const filePath = "data/data.json";
       const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
@@ -196,16 +160,16 @@
         const putRes = await fetch(apiUrl, {
           method: "PUT",
           headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ message: "تحديث المحتوى عبر لوحة التحكم", content: contentBase64, sha: sha || undefined })
+          body: JSON.stringify({ message: "تحديث المحتوى والرياضيات عبر لوحة التحكم", content: contentBase64, sha: sha || undefined })
         });
 
         if (putRes.ok) {
           alert("🎉 تم النشر بنجاح على الموقع!");
         } else {
-          alert("فشل النشر، تأكد من صحة البيانات والرمز.");
+          alert("فشل النشر، تأكد من بياناتك.");
         }
       } catch (e) {
-        alert("خطأ في الاتصال: " + e.message);
+        alert("خطأ: " + e.message);
       }
     }
 
@@ -256,7 +220,7 @@
 
     function addNewUnit() {
       const unitName = document.getElementById("inpUnitName").value.trim();
-      if (!unitName) { alert("اكتب اسم الوحدة أولاً."); return; }
+      if (!unitName) { alert("أدخل اسم الوحدة أولاً."); return; }
       const gradeId = document.getElementById("selGrade").value;
       const grade = localData.grades.find(g => g.id === gradeId);
       const newUnitId = "u_" + Date.now();
@@ -392,6 +356,16 @@
         alert("تم الحذف.");
         populateLessons();
       }
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "data.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
     }
   </script>
 </body>
