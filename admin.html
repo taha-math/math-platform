@@ -1,372 +1,283 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة التحكم الذكية - منصة الأستاذ طه</title>
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - منصة الأستاذ طه للرياضيات</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mammoth.js for Word .docx conversion -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
-<body>
-  <header>
-    <h1>لوحة التحكم والنشر المباشر</h1>
-    <nav>
-      <a href="index.html">عرض الموقع</a>
-      <button class="theme-toggle" onclick="toggleTheme()">🌓 النمط</button>
-    </nav>
-  </header>
+<body class="bg-gray-50 text-gray-800 font-sans">
 
-  <div class="container">
-    <div style="margin-bottom: 2rem; background: var(--card-bg); padding: 1.5rem; border-radius: 8px; border: 2px solid var(--primary-color);">
-      <h3 style="color:var(--primary-color); margin-bottom:0.5rem;">إعدادات النشر التلقائي (GitHub API)</h3>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-        <div class="form-group" style="margin:0;">
-          <label>اسم المستخدم والمستودع:</label>
-          <input type="text" id="ghRepo" placeholder="taha-math/math-platform">
+    <!-- Navbar -->
+    <header class="bg-indigo-700 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold"><i class="fas fa-cogs ml-2"></i> لوحة تحكم منصة الأستاذ طه</h1>
+            <a href="index.html" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded text-sm transition"><i class="fas fa-home ml-1"></i> العودة للمنصة</a>
         </div>
-        <div class="form-group" style="margin:0;">
-          <label>رمز الربط الشخصي (GitHub Token):</label>
-          <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-5xl">
+        
+        <!-- Success Alert -->
+        <div id="alertBox" class="hidden mb-6 p-4 rounded-lg bg-green-100 text-green-700 border border-green-300 font-medium"></div>
+
+        <!-- Add/Edit Lesson Card -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <h2 id="formTitle" class="text-lg font-bold text-indigo-700 mb-4 border-b pb-2"><i class="fas fa-plus-circle ml-2"></i> إضافة درس جديد</h2>
+            
+            <form id="lessonForm" class="space-y-4">
+                <input type="hidden" id="lessonId">
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">الصف الدراسي</label>
+                        <select id="gradeSelect" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500" required>
+                            <option value="">اختر الصف...</option>
+                            <option value="7">الصف السابع</option>
+                            <option value="8">الصف الثامن</option>
+                            <option value="9">الصف التاسع</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">رقم/اسم الوحدة</label>
+                        <input type="text" id="unitInput" class="w-full border rounded-lg p-2.5" placeholder="مثال: الوحدة الأولى: الجبر" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">عنوان الدرس</label>
+                        <input type="text" id="titleInput" class="w-full border rounded-lg p-2.5" placeholder="مثال: الأعداد النسبية" required>
+                    </div>
+                </div>
+
+                <!-- Word Importer Section -->
+                <div class="border-2 border-dashed border-indigo-200 bg-indigo-50/50 rounded-xl p-4 text-center">
+                    <label class="block text-sm font-bold text-indigo-700 mb-2"><i class="fas fa-file-word ml-1"></i> استيراد محتوى من ملف Word (.docx)</label>
+                    <input type="file" id="wordFile" accept=".docx" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
+                    <p class="text-xs text-gray-500 mt-1">سيتم استخراج النصوص، الفقرات، الصور والمعادلات الرياضية تلقائياً.</p>
+                </div>
+
+                <!-- PDF Attachment -->
+                <div>
+                    <label class="block text-sm font-medium mb-1"><i class="fas fa-file-pdf text-red-600 ml-1"></i> ملف PDF مرفق (اختياري)</label>
+                    <input type="file" id="pdfFile" accept=".pdf" class="w-full border rounded-lg p-2 bg-white text-sm">
+                    <span id="pdfStatus" class="text-xs text-gray-500"></span>
+                </div>
+
+                <!-- Content Editor -->
+                <div>
+                    <label class="block text-sm font-medium mb-1">محتوى الدرس (HTML / MathJax)</label>
+                    <textarea id="contentInput" rows="8" class="w-full border rounded-lg p-3 font-mono text-sm focus:ring-2 focus:ring-indigo-500" placeholder="محتوى الدرس يظهر هنا تلقائياً عند رفع ملف Word أو يمكنك تعديله يدوياً..." required></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" id="cancelBtn" onclick="resetForm()" class="hidden bg-gray-300 text-gray-700 px-5 py-2 rounded-lg font-medium hover:bg-gray-400">إلغاء التعديل</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 shadow"><i class="fas fa-save ml-1"></i> حفظ الدرس وتحديث المنصة</button>
+                </div>
+            </form>
         </div>
-      </div>
-      <button class="btn" style="background:#059669; margin-top:0;" onclick="saveGitHubSettings()">حفظ بيانات الربط</button>
-      <span id="saveStatus" style="margin-right:1rem; font-weight:600; color:#059669;"></span>
-    </div>
 
-    <div style="margin-bottom: 2rem; background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-      <div>
-        <h3 style="margin:0;">النشر الفوري على الموقع</h3>
-        <p style="margin:0; font-size:0.85rem; color:#64748b;">انشر تعديلاتك ومعادلاتك الرياضية مباشرة.</p>
-      </div>
-      <div>
-        <button class="btn" style="background:#2563eb; font-size:1.1rem; padding: 0.75rem 1.5rem; margin-top:0;" onclick="publishToGitHub()">🚀 حفظ ونشر مباشر على GitHub</button>
-        <button class="btn" style="background:#4b5563; margin-top:0; margin-right:0.5rem;" onclick="exportData()">تنزيل احتياطي (JSON)</button>
-      </div>
-    </div>
-
-    <div class="admin-container">
-      <div>
-        <div class="card" style="margin-bottom: 1.5rem; border: 2px solid var(--primary-color);">
-          <h3 style="color:var(--primary-color)">1. إدارة الوحدات الدراسية</h3>
-          <div class="form-group">
-            <label>اختر الصف:</label>
-            <select id="selGrade" onchange="populateUnits()"></select>
-          </div>
-          <div class="form-group">
-            <label>اختر الوحدة الحالية:</label>
-            <select id="selUnit" onchange="onUnitSelected()"></select>
-          </div>
-          <div class="form-group">
-            <label>تعديل اسم الوحدة أو إضافة وحدة جديدة:</label>
-            <input type="text" id="inpUnitName" placeholder="اكتب اسم الوحدة هنا...">
-          </div>
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button class="btn" style="background: #059669; margin-top:0;" onclick="addNewUnit()">+ إضافة وحدة جديدة</button>
-            <button class="btn" style="background: #d97706; margin-top:0;" onclick="updateCurrentUnit()">💾 حفظ اسم الوحدة</button>
-            <button class="btn" style="background: #dc2626; margin-top:0;" onclick="deleteCurrentUnit()">🗑️ حذف الوحدة</button>
-          </div>
+        <!-- Lessons Management Table -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-4 bg-gray-100 border-b font-bold text-gray-700 flex justify-between items-center">
+                <span><i class="fas fa-list ml-2"></i> الدروس المتاحة حالياً</span>
+                <button onclick="exportJSONData()" class="bg-green-600 text-white text-xs px-3 py-1.5 rounded hover:bg-green-700"><i class="fas fa-download ml-1"></i> تحميل ملف البيانات (data.json)</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-600 text-xs border-b">
+                            <th class="p-3">الصف</th>
+                            <th class="p-3">الوحدة</th>
+                            <th class="p-3">عنوان الدرس</th>
+                            <th class="p-3 text-center">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lessonsTableBody" class="divide-y divide-gray-200 text-sm">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="card" style="margin-bottom: 1.5rem;">
-          <h3 style="color:var(--primary-color)">2. إدارة الدروس</h3>
-          <div class="form-group">
-            <label>اختر الدرس أو أضف جديداً:</label>
-            <select id="selLesson" onchange="loadLessonData()"></select>
-          </div>
-        </div>
+    </main>
 
-        <div class="card">
-          <h3 style="color:var(--primary-color)">3. محرر محتوى الدرس (دعم MathJax للأسس والجذور)</h3>
-          <div class="form-group">
-            <label>عنوان الدرس:</label>
-            <input type="text" id="inpTitle" oninput="livePreview()">
-          </div>
-          <div class="form-group">
-            <label>الشرح (اكتب المعادلات هكذا: \( x^2 \) أو الجذور \( \sqrt{x} \)):</label>
-            <textarea id="inpExplanation" oninput="livePreview()"></textarea>
-          </div>
-          <div class="form-group">
-            <label>الأمثلة:</label>
-            <textarea id="inpExamples" oninput="livePreview()"></textarea>
-          </div>
-          <div class="form-group">
-            <label>التمارين:</label>
-            <textarea id="inpExercises" oninput="livePreview()"></textarea>
-          </div>
-          <div class="form-group">
-            <label>الحلول:</label>
-            <textarea id="inpSolutions" oninput="livePreview()"></textarea>
-          </div>
-          <div class="form-group">
-            <label>ملاحظات:</label>
-            <textarea id="inpNotes" oninput="livePreview()"></textarea>
-          </div>
-          <button class="btn" onclick="saveCurrentLesson()">حفظ الدرس (إضافة/تعديل)</button>
-          <button class="btn" style="background:#dc2626; margin-right:0.5rem;" onclick="deleteCurrentLesson()">حذف هذا الدرس</button>
-        </div>
-      </div>
+    <script>
+        let lessons = JSON.parse(localStorage.getItem('math_lessons')) || [
+            {
+                id: 1,
+                grade: "7",
+                unit: "الوحدة الأولى",
+                title: "مقدمة في الأعداد النسبية",
+                content: "<p>تعريف العدد النسبي: هو كل عدد يمكن كتابته على صورة كسـر $\\frac{a}{b}$ حيث $b \\neq 0$.</p>",
+                pdf: ""
+            }
+        ];
 
-      <div>
-        <h3>معاينة فورية للدرس (Live Preview)</h3>
-        <div class="preview-pane" id="previewPane" style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:10px; padding:1.5rem;">
-          <h2 id="prevTitle" style="color:var(--primary-color); margin-bottom:1rem;">عنوان المعاينة</h2>
-          <div id="prevContent">ستظهر المعاينة الرياضية هنا تماماً كما يراها الطالب...</div>
-        </div>
-      </div>
-    </div>
-  </div>
+        // Handle Word File Upload & Mammoth.js conversion
+        document.getElementById('wordFile').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-  <footer>
-    <p>منصة الأستاذ طه للرياضيات</p>
-  </footer>
-
-  <script src="assets/js/app.js"></script>
-  <script>
-    let localData = null;
-
-    document.addEventListener("DOMContentLoaded", () => {
-      loadSavedSettings();
-    });
-
-    function loadSavedSettings() {
-      document.getElementById("ghRepo").value = localStorage.getItem("gh_repo") || "";
-      document.getElementById("ghToken").value = localStorage.getItem("gh_token") || "";
-    }
-
-    function saveGitHubSettings() {
-      localStorage.setItem("gh_repo", document.getElementById("ghRepo").value.trim());
-      localStorage.setItem("gh_token", document.getElementById("ghToken").value.trim());
-      document.getElementById("saveStatus").innerText = "✓ تم الحفظ!";
-      setTimeout(() => document.getElementById("saveStatus").innerText = "", 3000);
-    }
-
-    async function publishToGitHub() {
-      const repo = document.getElementById("ghRepo").value.trim();
-      const token = document.getElementById("ghToken").value.trim();
-      if (!repo || !token) { alert("أدخل اسم المستودع والرمز أولاً."); return; }
-      if (!confirm("نشر التعديلات على الموقع؟")) return;
-
-      const filePath = "data/data.json";
-      const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
-
-      try {
-        const getRes = await fetch(apiUrl, { headers: { "Authorization": `token ${token}` } });
-        let sha = getRes.ok ? (await getRes.json()).sha : "";
-
-        const jsonString = JSON.stringify(localData, null, 2);
-        const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
-
-        const putRes = await fetch(apiUrl, {
-          method: "PUT",
-          headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ message: "تحديث المحتوى والرياضيات عبر لوحة التحكم", content: contentBase64, sha: sha || undefined })
+            const reader = new FileReader();
+            reader.onload = function(loadEvent) {
+                const arrayBuffer = loadEvent.target.result;
+                
+                mammoth.convertToHtml({arrayBuffer: arrayBuffer}, {
+                    transformDocument: mammoth.images.inline(function(element) {
+                        return element.read("base64").then(function(imageBuffer) {
+                            return {
+                                src: "data:" + element.contentType + ";base64," + imageBuffer
+                            };
+                        });
+                    })
+                })
+                .then(function(result) {
+                    let html = result.value;
+                    // Basic MathJax syntax correction helper for common Word math symbols
+                    html = html.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                    document.getElementById('contentInput').value = html;
+                    showAlert("تم استخراج محتوى ملف Word بنجاح والحفاظ على التنسيقات والصور!", "success");
+                })
+                .catch(function(err) {
+                    alert("حدث خطأ أثناء قراءة ملف Word: " + err.message);
+                });
+            };
+            reader.readAsArrayBuffer(file);
         });
 
-        if (putRes.ok) {
-          alert("🎉 تم النشر بنجاح على الموقع!");
-        } else {
-          alert("فشل النشر، تأكد من بياناتك.");
+        // Handle PDF attachment
+        let currentPdfData = "";
+        document.getElementById('pdfFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(upload) {
+                    currentPdfData = upload.target.result;
+                    document.getElementById('pdfStatus').innerText = "تم إرفاق الملف: " + file.name;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Form Submit (Add or Update)
+        document.getElementById('lessonForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('lessonId').value;
+            const grade = document.getElementById('gradeSelect').value;
+            const unit = document.getElementById('unitInput').value;
+            const title = document.getElementById('titleInput').value;
+            const content = document.getElementById('contentInput').value;
+
+            if (id) {
+                // Update
+                lessons = lessons.map(l => l.id == id ? { ...l, grade, unit, title, content, pdf: currentPdfData || l.pdf } : l);
+                showAlert("تم تحديث الدرس بنجاح!", "success");
+            } else {
+                // Add new
+                const newLesson = {
+                    id: Date.now(),
+                    grade,
+                    unit,
+                    title,
+                    content,
+                    pdf: currentPdfData
+                };
+                lessons.push(newLesson);
+                showAlert("تم إضافة الدرس الجديد بنجاح وإدراجه في المنصة!", "success");
+            }
+
+            saveAndRefresh();
+            resetForm();
+        });
+
+        function saveAndRefresh() {
+            localStorage.setItem('math_lessons', JSON.stringify(lessons));
+            renderTable();
         }
-      } catch (e) {
-        alert("خطأ: " + e.message);
-      }
-    }
 
-    function initPage(data) {
-      localData = data;
-      populateGradesDropdown();
-    }
+        function renderTable() {
+            const tbody = document.getElementById('lessonsTableBody');
+            tbody.innerHTML = '';
+            if (lessons.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-400">لا توجد دروس مضافة حالياً.</td></tr>`;
+                return;
+            }
 
-    function populateGradesDropdown() {
-      const sel = document.getElementById("selGrade");
-      sel.innerHTML = "";
-      localData.grades.forEach(g => {
-        let opt = document.createElement("option");
-        opt.value = g.id;
-        opt.textContent = g.name;
-        sel.appendChild(opt);
-      });
-      populateUnits();
-    }
-
-    function populateUnits() {
-      const gradeId = document.getElementById("selGrade").value;
-      const grade = localData.grades.find(g => g.id === gradeId);
-      const sel = document.getElementById("selUnit");
-      sel.innerHTML = "";
-      if (!grade || grade.units.length === 0) {
-        document.getElementById("inpUnitName").value = "";
-        populateLessons();
-        return;
-      }
-      grade.units.forEach(u => {
-        let opt = document.createElement("option");
-        opt.value = u.id;
-        opt.textContent = u.name;
-        sel.appendChild(opt);
-      });
-      onUnitSelected();
-    }
-
-    function onUnitSelected() {
-      const gradeId = document.getElementById("selGrade").value;
-      const unitId = document.getElementById("selUnit").value;
-      const grade = localData.grades.find(g => g.id === gradeId);
-      const unit = grade ? grade.units.find(u => u.id === unitId) : null;
-      document.getElementById("inpUnitName").value = unit ? unit.name : "";
-      populateLessons();
-    }
-
-    function addNewUnit() {
-      const unitName = document.getElementById("inpUnitName").value.trim();
-      if (!unitName) { alert("أدخل اسم الوحدة أولاً."); return; }
-      const gradeId = document.getElementById("selGrade").value;
-      const grade = localData.grades.find(g => g.id === gradeId);
-      const newUnitId = "u_" + Date.now();
-      grade.units.push({ id: newUnitId, name: unitName, lessons: [] });
-      alert("تمت إضافة الوحدة!");
-      populateUnits();
-      document.getElementById("selUnit").value = newUnitId;
-      onUnitSelected();
-    }
-
-    function updateCurrentUnit() {
-      const gradeId = document.getElementById("selGrade").value;
-      const unitId = document.getElementById("selUnit").value;
-      const unitName = document.getElementById("inpUnitName").value.trim();
-      if (!unitId || !unitName) return;
-      const grade = localData.grades.find(g => g.id === gradeId);
-      const unit = grade.units.find(u => u.id === unitId);
-      if (unit) {
-        unit.name = unitName;
-        alert("تم تحديث اسم الوحدة!");
-        populateUnits();
-        document.getElementById("selUnit").value = unitId;
-      }
-    }
-
-    function deleteCurrentUnit() {
-      const gradeId = document.getElementById("selGrade").value;
-      const unitId = document.getElementById("selUnit").value;
-      if (!unitId) return;
-      if (confirm("حذف هذه الوحدة مع دروسها؟")) {
-        const grade = localData.grades.find(g => g.id === gradeId);
-        grade.units = grade.units.filter(u => u.id !== unitId);
-        alert("تم الحذف.");
-        populateUnits();
-      }
-    }
-
-    function populateLessons() {
-      const gradeId = document.getElementById("selGrade").value;
-      const unitId = document.getElementById("selUnit").value;
-      const grade = localData.grades.find(g => g.id === gradeId);
-      const unit = grade ? grade.units.find(u => u.id === unitId) : null;
-      const sel = document.getElementById("selLesson");
-      sel.innerHTML = '<option value="new">+ إضافة درس جديد</option>';
-      if (!unit) return;
-      unit.lessons.forEach(l => {
-        let opt = document.createElement("option");
-        opt.value = l.id;
-        opt.textContent = l.title;
-        sel.appendChild(opt);
-      });
-      loadLessonData();
-    }
-
-    function loadLessonData() {
-      const gradeId = document.getElementById("selGrade").value;
-      const unitId = document.getElementById("selUnit").value;
-      const lessonId = document.getElementById("selLesson").value;
-      const grade = localData.grades.find(g => g.id === gradeId);
-      const unit = grade ? grade.units.find(u => u.id === unitId) : null;
-      
-      if (lessonId === "new" || !unit) {
-        document.getElementById("inpTitle").value = "";
-        document.getElementById("inpExplanation").value = "";
-        document.getElementById("inpExamples").value = "";
-        document.getElementById("inpExercises").value = "";
-        document.getElementById("inpSolutions").value = "";
-        document.getElementById("inpNotes").value = "";
-      } else {
-        const lesson = unit.lessons.find(l => l.id === lessonId);
-        if (lesson) {
-          document.getElementById("inpTitle").value = lesson.title;
-          document.getElementById("inpExplanation").value = lesson.explanation || "";
-          document.getElementById("inpExamples").value = lesson.examples || "";
-          document.getElementById("inpExercises").value = lesson.exercises || "";
-          document.getElementById("inpSolutions").value = lesson.solutions || "";
-          document.getElementById("inpNotes").value = lesson.notes || "";
+            lessons.forEach(l => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3"><span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold">الصف ${l.grade}</span></td>
+                        <td class="p-3">${l.unit}</td>
+                        <td class="p-3 font-medium">${l.title}</td>
+                        <td class="p-3 text-center space-x-2 space-x-reverse">
+                            <button onclick="editLesson(${l.id})" class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600"><i class="fas fa-edit"></i> تعديل</button>
+                            <button onclick="deleteLesson(${l.id})" class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600"><i class="fas fa-trash"></i> حذف</button>
+                        </td>
+                    </tr>
+                `;
+            });
         }
-      }
-      livePreview();
-    }
 
-    function livePreview() {
-      const title = document.getElementById("inpTitle").value || "عنوان الدرس";
-      const exp = document.getElementById("inpExplanation").value || "";
-      document.getElementById("prevTitle").innerText = title;
-      document.getElementById("prevContent").innerHTML = `<h4>الشرح:</h4><div>${exp}</div>`;
-      renderMath();
-    }
+        function editLesson(id) {
+            const l = lessons.find(item => item.id == id);
+            if (!l) return;
+            document.getElementById('lessonId').value = l.id;
+            document.getElementById('gradeSelect').value = l.grade;
+            document.getElementById('unitInput').value = l.unit;
+            document.getElementById('titleInput').value = l.title;
+            document.getElementById('contentInput').value = l.content;
+            currentPdfData = l.pdf || "";
+            document.getElementById('pdfStatus').innerText = l.pdf ? "يوجد ملف PDF مرفق مسبقاً" : "";
+            document.getElementById('formTitle').innerHTML = `<i class="fas fa-edit ml-2"></i> تعديل الدرس: ${l.title}`;
+            document.getElementById('cancelBtn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-    function saveCurrentLesson() {
-      const gradeId = document.getElementById("selGrade").value;
-      const unitId = document.getElementById("selUnit").value;
-      if (!unitId) { alert("اختر الوحدة أولاً."); return; }
-      const grade = localData.grades.find(g => g.id === gradeId);
-      const unit = grade.units.find(u => u.id === unitId);
-      const lessonId = document.getElementById("selLesson").value;
+        function deleteLesson(id) {
+            if (confirm("هل أنت متأكد من حذف هذا الدرس نهائياً؟")) {
+                lessons = lessons.filter(l => l.id != id);
+                saveAndRefresh();
+                showAlert("تم حذف الدرس بنجاح.", "success");
+            }
+        }
 
-      const title = document.getElementById("inpTitle").value;
-      if (!title) { alert("أدخل عنوان الدرس."); return; }
+        function resetForm() {
+            document.getElementById('lessonForm').reset();
+            document.getElementById('lessonId').value = '';
+            document.getElementById('formTitle').innerHTML = `<i class="fas fa-plus-circle ml-2"></i> إضافة درس جديد`;
+            document.getElementById('cancelBtn').classList.add('hidden');
+            document.getElementById('pdfStatus').innerText = '';
+            currentPdfData = "";
+        }
 
-      const lessonData = {
-        id: lessonId === "new" ? "l_" + Date.now() : lessonId,
-        title: title,
-        explanation: document.getElementById("inpExplanation").value,
-        examples: document.getElementById("inpExamples").value,
-        exercises: document.getElementById("inpExercises").value,
-        solutions: document.getElementById("inpSolutions").value,
-        notes: document.getElementById("inpNotes").value
-      };
+        function showAlert(msg, type) {
+            const box = document.getElementById('alertBox');
+            box.innerText = msg;
+            box.classList.remove('hidden');
+            setTimeout(() => box.classList.add('hidden'), 4000);
+        }
 
-      if (lessonId === "new") {
-        unit.lessons.push(lessonData);
-        alert("تمت إضافة الدرس محلياً! انقر على زر النشر المباشر لاعتماده.");
-        populateLessons();
-        document.getElementById("selLesson").value = lessonData.id;
-      } else {
-        const idx = unit.lessons.findIndex(l => l.id === lessonId);
-        if (idx !== -1) unit.lessons[idx] = lessonData;
-        alert("تم تحديث الدرس محلياً!");
-      }
-    }
+        function exportJSONData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(lessons, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "data.json");
+            dlAnchorElem.click();
+        }
 
-    function deleteCurrentLesson() {
-      const gradeId = document.getElementById("selGrade").value;
-      const unitId = document.getElementById("selUnit").value;
-      const lessonId = document.getElementById("selLesson").value;
-      if (lessonId === "new" || !unitId) return;
-      if (confirm("حذف هذا الدرس؟")) {
-        const grade = localData.grades.find(g => g.id === gradeId);
-        const unit = grade.units.find(u => u.id === unitId);
-        unit.lessons = unit.lessons.filter(l => l.id !== lessonId);
-        alert("تم الحذف.");
-        populateLessons();
-      }
-    }
-
-    function exportData() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localData, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", "data.json");
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
-  </script>
+        renderTable();
+    </script>
 </body>
 </html>
