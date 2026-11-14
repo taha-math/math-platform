@@ -1,84 +1,123 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>منصة الأستاذ طه للرياضيات</title>
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الأستاذ طه للرياضيات</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
-<body>
-  <header>
-    <h1>منصة الأستاذ طه للرياضيات</h1>
-    <nav>
-      <a href="index.html">الرئيسية</a>
-      <a href="admin.html">لوحة التحكم</a>
-      <button class="theme-toggle" onclick="toggleTheme()">🌓 النمط</button>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="bg-indigo-700 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center">
+            <div class="text-center md:text-right mb-4 md:mb-0">
+                <h1 class="text-2xl md:text-3xl font-extrabold"><i class="fas fa-calculator ml-2"></i> منصة الأستاذ طه للرياضيات</h1>
+                <p class="text-indigo-200 text-sm mt-1">شرح مبسط، تمارين تفاعلية، وملخصات للمرحلة الإعدادية (7 - 8 - 9)</p>
+            </div>
+            <div>
+                <a href="admin.html" class="bg-white text-indigo-700 px-4 py-2 rounded-lg font-bold text-sm shadow hover:bg-indigo-50 transition"><i class="fas fa-lock ml-1"></i> لوحة التحكم</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation / Grade Selector -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="container mx-auto px-4 flex justify-center space-x-4 space-x-reverse py-3">
+            <button onclick="filterGrade('all')" class="grade-btn px-5 py-2 rounded-full font-bold text-sm bg-indigo-600 text-white transition shadow-sm">جميع الصفوف</button>
+            <button onclick="filterGrade('7')" class="grade-btn px-5 py-2 rounded-full font-bold text-sm bg-gray-200 text-gray-700 hover:bg-indigo-100 transition">الصف السابع</button>
+            <button onclick="filterGrade('8')" class="grade-btn px-5 py-2 rounded-full font-bold text-sm bg-gray-200 text-gray-700 hover:bg-indigo-100 transition">الصف الثامن</button>
+            <button onclick="filterGrade('9')" class="grade-btn px-5 py-2 rounded-full font-bold text-sm bg-gray-200 text-gray-700 hover:bg-indigo-100 transition">الصف التاسع</button>
+        </div>
     </nav>
-  </header>
 
-  <div class="container">
-    <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن درس، مثال، تمرين أو قانون رياضي..." onkeyup="globalSearch()">
+    <!-- Content Area -->
+    <main class="container mx-auto px-4 py-8 flex-grow max-w-5xl">
+        <div id="lessonsContainer" class="space-y-6">
+            <!-- Dynamically populated -->
+        </div>
+    </main>
 
-    <h2 style="margin-bottom: 1.5rem;">اختر الصف الدراسي:</h2>
-    <div class="grid">
-      <div class="card">
-        <h3>الصف السابع</h3>
-        <p>دروس الجبر والهندسة، تمارين شاملة ومسائل محلولة.</p>
-        <a href="grade7.html" class="btn">تصفح الصف السابع</a>
-      </div>
-      <div class="card">
-        <h3>الصف الثامن</h3>
-        <p>الكثيرات الحدود، المطابقات، والوحدات الهندسية الأساسية.</p>
-        <a href="grade8.html" class="btn">تصفح الصف الثامن</a>
-      </div>
-      <div class="card">
-        <h3>الصف التاسع</h3>
-        <p>المعادلات التربيعية، الجذور، وبنك الأسئلة التحضيري.</p>
-        <a href="grade9.html" class="btn">تصفح الصف التاسع</a>
-      </div>
-    </div>
+    <!-- Footer -->
+    <footer class="bg-white border-t py-4 text-center text-sm text-gray-500">
+        <p>جميع الحقوق محفوظة © منصة الأستاذ طه للرياضيات | إشراف الأستاذ طه</p>
+    </footer>
 
-    <div id="searchResults" style="margin-top: 2rem;"></div>
-  </div>
-
-  <footer>
-    <p>جميع الحقوق محفوظة © منصة الأستاذ طه للرياضيات 2026</p>
-  </footer>
-
-  <script src="assets/js/app.js"></script>
-  <script>
-    function globalSearch() {
-      const query = document.getElementById("searchInput").value.trim().toLowerCase();
-      const resultsDiv = document.getElementById("searchResults");
-      if (!query || !window.appData) {
-        resultsDiv.innerHTML = "";
-        return;
-      }
-      
-      let html = "<h3>نتائج البحث:</h3><div class='grid'>";
-      let found = false;
-
-      window.appData.grades.forEach(grade => {
-        grade.units.forEach(unit => {
-          unit.lessons.forEach(lesson => {
-            if (lesson.title.toLowerCase().includes(query) || lesson.explanation.toLowerCase().includes(query) || lesson.examples.toLowerCase().includes(query)) {
-              found = true;
-              html += `<div class="card">
-                <span style="font-size:0.85rem; color:var(--primary-color);">${grade.name} > ${unit.name}</span>
-                <h3>${lesson.title}</h3>
-                <a href="lesson.html?grade=${grade.id}&unit=${unit.id}&lesson=${lesson.id}" class="btn">عرض الدرس</a>
-              </div>`;
+    <script>
+        let allLessons = JSON.parse(localStorage.getItem('math_lessons')) || [
+            {
+                id: 1,
+                grade: "7",
+                unit: "الوحدة الأولى",
+                title: "مقدمة في الأعداد النسبية",
+                content: "<p>تعريف العدد النسبي: هو كل عدد يمكن كتابته على صورة كسـر $\\frac{a}{b}$ حيث $b \\neq 0$.</p>",
+                pdf: ""
             }
-          });
-        });
-      });
-      html += "</div>";
-      resultsDiv.innerHTML = found ? html : "<p>لم يتم العثور على نتائج تطابق بحثك.</p>";
-      renderMath();
-    }
-  </script>
+        ];
+
+        function renderLessons(gradeFilter = 'all') {
+            const container = document.getElementById('lessonsContainer');
+            container.innerHTML = '';
+
+            const filtered = gradeFilter === 'all' ? allLessons : allLessons.filter(l => l.grade === gradeFilter);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-8 rounded-xl shadow text-center text-gray-500">
+                        <i class="fas fa-folder-open text-4xl mb-3 text-indigo-300"></i>
+                        <p class="text-lg">لا توجد دروس مضافة لهذا الصف حالياً. يمكنك إضافتها من لوحة التحكم.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(l => {
+                let pdfButton = l.pdf ? `<a href="${l.pdf}" download="درس_${l.title}.pdf" class="inline-flex items-center bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition shadow-sm"><i class="fas fa-file-pdf ml-2"></i> تحميل ملف PDF المرافق</a>` : '';
+
+                container.innerHTML += `
+                    <div class="bg-white rounded-xl shadow-md p-6 border-r-4 border-indigo-600 transition hover:shadow-lg">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">الصف ${l.grade} - ${l.unit}</span>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">${l.title}</h2>
+                        <div class="prose max-w-none text-gray-700 leading-relaxed mb-6 space-y-3">
+                            ${l.content}
+                        </div>
+                        <div class="flex items-center pt-4 border-t border-gray-100">
+                            ${pdfButton}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Re-render MathJax equations
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function filterGrade(grade) {
+            document.querySelectorAll('.grade-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            event.target.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+            renderLessons(grade);
+        }
+
+        renderLessons('all');
+    </script>
 </body>
 </html>
