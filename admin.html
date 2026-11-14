@@ -65,7 +65,7 @@
                 <div class="border-2 border-dashed border-indigo-200 bg-indigo-50/50 rounded-xl p-4 text-center">
                     <label class="block text-sm font-bold text-indigo-700 mb-2"><i class="fas fa-file-word ml-1"></i> استيراد محتوى من ملف Word (.docx)</label>
                     <input type="file" id="wordFile" accept=".docx" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
-                    <p class="text-xs text-gray-500 mt-1">سيتم استخراج النصوص، الفقرات، الصور والمعادلات الرياضية تلقائياً.</p>
+                    <p class="text-xs text-gray-500 mt-1">سيتم استخراج النصوص والفقرات والصور تلقائياً وملء محتوى الدرس أدناه.</p>
                 </div>
 
                 <!-- PDF Attachment -->
@@ -78,7 +78,8 @@
                 <!-- Content Editor -->
                 <div>
                     <label class="block text-sm font-medium mb-1">محتوى الدرس (HTML / MathJax)</label>
-                    <textarea id="contentInput" rows="8" class="w-full border rounded-lg p-3 font-mono text-sm focus:ring-2 focus:ring-indigo-500" placeholder="محتوى الدرس يظهر هنا تلقائياً عند رفع ملف Word أو يمكنك تعديله يدوياً..." required></textarea>
+                    <!-- إزالة required لكي لا يظهر خطأ الإلزام إذا تم رفع الملف وتأخرت الاستجابة -->
+                    <textarea id="contentInput" rows="8" class="w-full border rounded-lg p-3 font-mono text-sm focus:ring-2 focus:ring-indigo-500" placeholder="اكتب محتوى الدرس أو ارفع ملف Word ليتم ملؤه تلقائياً هنا..."></textarea>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-2">
@@ -130,6 +131,12 @@
             const file = event.target.files[0];
             if (!file) return;
 
+            // تعبئة حقل عنوان الدرس تلقائياً باسم الملف إن كان فارغاً
+            const titleInput = document.getElementById('titleInput');
+            if (!titleInput.value) {
+                titleInput.value = file.name.replace(/\.[^/.]+$/, "");
+            }
+
             const reader = new FileReader();
             reader.onload = function(loadEvent) {
                 const arrayBuffer = loadEvent.target.result;
@@ -145,10 +152,9 @@
                 })
                 .then(function(result) {
                     let html = result.value;
-                    // Basic MathJax syntax correction helper for common Word math symbols
                     html = html.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
                     document.getElementById('contentInput').value = html;
-                    showAlert("تم استخراج محتوى ملف Word بنجاح والحفاظ على التنسيقات والصور!", "success");
+                    showAlert("تم استخراج محتوى ملف Word بنجاح وإدراجه في الحقل أدناه!", "success");
                 })
                 .catch(function(err) {
                     alert("حدث خطأ أثناء قراءة ملف Word: " + err.message);
@@ -178,7 +184,7 @@
             const grade = document.getElementById('gradeSelect').value;
             const unit = document.getElementById('unitInput').value;
             const title = document.getElementById('titleInput').value;
-            const content = document.getElementById('contentInput').value;
+            const content = document.getElementById('contentInput').value || "<p>لا يوجد محتوى نصي مضاف.</p>";
 
             if (id) {
                 // Update
